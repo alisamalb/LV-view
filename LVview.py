@@ -55,7 +55,9 @@ def read_structure(path):
 	return structure
 
 def geom_center(atoms, index):
-	'''calculates the geometric center of the atoms selectted from the "atoms" list using the index'''
+	# Calculate the geometric center of the atoms selectted
+	#  from the "atoms" list using the index
+
 	sel_atoms=[atoms[x-1] for x in index]
 	sum_x=sum([a.x for a in sel_atoms])/len(sel_atoms)
 	sum_y=sum([a.y for a in sel_atoms])/len(sel_atoms)
@@ -63,6 +65,10 @@ def geom_center(atoms, index):
 	return (sum_x, sum_y, sum_z)
 
 def calculate_axis(atoms,index):
+	# Manage user input in the selection of Molecule A
+	# and Molecule B using a .gro file and .ndx file.
+	# The output is the geometric center of the two.
+
 	print("-- LV-VIEW --")
 	print("Select molecule A")
 	for i in range(len(index[0])):
@@ -77,6 +83,9 @@ def calculate_axis(atoms,index):
 	return (A_center,B_center)
 
 def write_sphere(structure, rho, maxtau,COM1):
+	# Create a grid of dummy atoms in space
+	# to depict the LV volume
+
 	j=np.linspace(-rho,rho,int(rho*50))
 	for x in j:
 		for y in j:
@@ -94,22 +103,36 @@ def write_sphere(structure, rho, maxtau,COM1):
 						for i in range(int(rho)*10):
 							structure.addAtom("DUM","DUM",x*(i/rho/10)+COM1[0],y*np.sqrt(i/rho/10)+COM1[1],np.sqrt(i/rho/10)*z+COM1[2])
 
+def create_protein_index(structure, rho, maxtau, COM1):
+	# Create a new entry of all the atoms of Molecule A
+	# within the volume. Usueful to apply RMSD restraint
+	# to all the atoms outside
+
+	pass
+	
 def suggest_rotation(COM1,COM2):
+	# Calculate the rotation around the z-ax that minimized the
+	# distance between the  COM2 and the x-axis (a.k.a. the central
+	# ax of the volume)
+
 	vector=[COM1[0]-COM2[0],COM1[1]-COM2[1],COM1[2]-COM2[2]]		
 	print("The COM1 -> COM2 vector is {}".format(vector))
 	dist=np.sqrt(vector[0]**2+vector[1]**2)
 	rot=-np.arcsin(vector[1]/dist)*180/3.14
 	print("The suggested rotation is 0 0 "+str(rot)+" degrees.")
 	print("The initial tau angle is "+str(np.sqrt(vector[0]+dist)))
-index=read_index(input("Path to the index file: "))
-structure=read_structure(input("Path to the structure: "))
-COM1,COM2=calculate_axis(structure.atoms,index)
-suggest_rotation(COM1,COM2)
-print("The COM1 is {}".format(COM1))
-rho=float(input("Max radius of the sphere (rho): "))
-maxtau=float(input("Max tau angle: "))
-volume=Structure()
-volume.coord=structure.coord
-write_sphere(volume,rho,maxtau,COM1)
-volume.write("volume.gro")
 
+def Main():
+	index=read_index(input("Path to the index file: "))
+	structure=read_structure(input("Path to the structure: "))
+	COM1,COM2=calculate_axis(structure.atoms,index)
+	suggest_rotation(COM1,COM2)
+	print("The COM1 is {}".format(COM1))
+	rho=float(input("Max radius of the sphere (rho): "))
+	maxtau=float(input("Max tau angle: "))
+	volume=Structure()
+	volume.coord=structure.coord
+	write_sphere(volume,rho,maxtau,COM1)
+	volume.write("volume.gro")
+
+Main()
