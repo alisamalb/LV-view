@@ -5,7 +5,10 @@ class Structure:
 		self.atoms=[]
 		self.coord=''
 	def addAtom(self,resname,name,x,y,z):
-		resnr=self.atoms[-1].resnr+1
+		if len(self.atoms)>0:
+			resnr=self.atoms[-1].resnr+1
+		else:
+			resnr=1
 		number=(len(self.atoms)+1)%99999
 		self.atoms.append(Atom("%5d%-5s%5s%5d%8.3f%8.3f%8.3f" % (resnr,resname,name,number,x,y,z)))
 	def write(self, path):
@@ -96,13 +99,17 @@ def suggest_rotation(COM1,COM2):
 	print("The COM1 -> COM2 vector is {}".format(vector))
 	dist=np.sqrt(vector[0]**2+vector[1]**2)
 	rot=-np.arcsin(vector[1]/dist)*180/3.14
-	print("The suggested rotation is 0 0 "+str(rot)+" radians.")
+	print("The suggested rotation is 0 0 "+str(rot)+" degrees.")
 	print("The initial tau angle is "+str(np.sqrt(vector[0]+dist)))
 index=read_index(input("Path to the index file: "))
 structure=read_structure(input("Path to the structure: "))
 COM1,COM2=calculate_axis(structure.atoms,index)
 suggest_rotation(COM1,COM2)
+print("The COM1 is {}".format(COM1))
 rho=float(input("Max radius of the sphere (rho): "))
 maxtau=float(input("Max tau angle: "))
-write_sphere(structure,rho,maxtau,COM1)
-structure.write("volume.gro")
+volume=Structure()
+volume.coord=structure.coord
+write_sphere(volume,rho,maxtau,COM1)
+volume.write("volume.gro")
+
