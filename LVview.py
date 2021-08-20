@@ -95,7 +95,7 @@ def write_sphere(structure, rho, maxtau,COM1):
 					position=(x+COM1[0],y+COM1[1],z+COM1[2])
 					theta=np.arctan2(z,y)
 					distance=np.sqrt(x*x+y*y+z*z)
-					tau=np.sqrt(x+distance)
+					tau=np.sqrt(-x+distance)
 					taulim=maxtau
 					if  tau<taulim:
 						structure.addAtom("DUM","DUM",position[0],position[1],position[2])
@@ -136,3 +136,4 @@ def Main():
 	volume.write("volume.gro")
 
 Main()
+
