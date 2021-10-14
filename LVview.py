@@ -103,12 +103,32 @@ def write_sphere(structure, rho, maxtau,COM1):
 						for i in range(int(rho)*10):
 							structure.addAtom("DUM","DUM",x*(i/rho/10)+COM1[0],y*np.sqrt(i/rho/10)+COM1[1],np.sqrt(i/rho/10)*z+COM1[2])
 
-def create_protein_index(structure, rho, maxtau, COM1):
+
+def create_protein_index(structure, rho, maxtau, COM1,index):
 	# Create a new entry of all the atoms of Molecule A
 	# within the volume. Usueful to apply RMSD restraint
 	# to all the atoms outside
-
-	pass
+	print("Select molecule you will use for restraints:")
+	for i in range(len(index[0])):
+		print(str(i)+". "+index[0][i])
+	mol_A=int(input("\nSelect group: "))
+	sel_atoms=[structure.atoms[x-1] for x in index[1][mol_A]]
+	
+	new_index_group=[]
+	i=0
+	for a in sel_atoms:
+		x,y,z=np.array([a.x,a.y,a.z])-np.array(COM1)	
+		position=(x+COM1[0],y+COM1[1],z+COM1[2])
+		theta=np.arctan2(z,y)
+		distance=np.sqrt(x*x+y*y+z*z)
+		tau=np.sqrt(x+distance)
+		taulim=maxtau
+		if  tau<taulim and distance<rho:
+			new_index_group.append('%5i' % a.number)
+			i+=1
+			if i%15==0:
+				new_index_group.append('\n')
+	print(''.join(new_index_group))
 	
 def suggest_rotation(COM1,COM2):
 	# Calculate the rotation around the z-ax that minimized the
@@ -134,6 +154,8 @@ def Main():
 	volume.coord=structure.coord
 	write_sphere(volume,rho,maxtau,COM1)
 	volume.write("volume.gro")
+	if input("Do you want to print an index of all the Molecule A's atoms inside the volume? (yes/[no])")=='yes':
+			create_protein_index(structure, rho, maxtau, COM1,index)
 
 Main()
 
