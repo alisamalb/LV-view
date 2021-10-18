@@ -121,7 +121,7 @@ def create_protein_index(structure, rho, maxtau, COM1,index):
 		position=(x+COM1[0],y+COM1[1],z+COM1[2])
 		theta=np.arctan2(z,y)
 		distance=np.sqrt(x*x+y*y+z*z)
-		tau=np.sqrt(x+distance)
+		tau=np.sqrt(-x+distance)
 		taulim=maxtau
 		if  tau<taulim and distance<rho:
 			new_index_group.append('%5i' % a.number)
