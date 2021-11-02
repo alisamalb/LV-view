@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.spatial
 class Structure:
 	def __init__(self):
 		self.atomlines=0
@@ -29,6 +30,16 @@ class Atom:
 		self.x=float(line[20:28])
 		self.y=float(line[28:36])
 		self.z=float(line[36:44])
+
+	def rotate(self,rotation,COM1):
+		self.x-=COM1[0]
+		self.y-=COM1[1]
+		self.z-=COM1[2]
+		coord=np.array(np.array([self.x,self.y,self.z]))
+		coord=rotation.apply(coord)
+		self.x=coord[0]+COM1[0]
+		self.y=coord[1]+COM1[1]
+		self.z=coord[2]+COM1[2]
 
 def fixed_string(string,length):
 	return " "*(length-len(str(string)))+str(string)
@@ -141,7 +152,13 @@ def suggest_rotation(COM1,COM2):
 	rot=-np.arcsin(vector[1]/dist)*180/3.14
 	print("The suggested rotation is 0 0 "+str(rot)+" degrees.")
 	print("The initial tau angle is "+str(np.sqrt(vector[0]+dist)))
-
+	
+def calculate_rotation(COM1,COM2,Membrane=True):
+   vector=np.array([COM1[0]-COM2[0],COM1[1]-COM2[1],COM1[2]-COM2[2]])
+   vector_length=np.sqrt(vector.dot(vector))
+   ref_vector=np.array([-vector_length,0,0]).reshape((1,3))
+   return scipy.spatial.transform.Rotation.align_vectors(ref_vector,vector.reshape((1,3)))
+	
 def Main():
 	index=read_index(input("Path to the index file: "))
 	structure=read_structure(input("Path to the structure: "))
@@ -153,9 +170,11 @@ def Main():
 	volume=Structure()
 	volume.coord=structure.coord
 	write_sphere(volume,rho,maxtau,COM1)
-	volume.write("volume.gro")
-	if input("Do you want to print an index of all the Molecule A's atoms inside the volume? (yes/[no])")=='yes':
+	r=calculate_rotation(COM1,COM2,True)[0]
+	[x.rotate(r,COM1) for x in structure.atoms]
+	volume.write("reference_volume.gro")
+	if input("Do you want to print an index of all the (rotated) Molecule A's atoms inside the volume? (yes/[no])")=='yes':
 			create_protein_index(structure, rho, maxtau, COM1,index)
+	structure.write("reference_rotated.gro")
 
 Main()
-
