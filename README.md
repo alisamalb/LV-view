@@ -1,12 +1,12 @@
 # Localized Volume Viewer: creating volume restraints for biased molecular dynamics
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7575202.svg)](https://doi.org/10.5281/zenodo.7575202)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7575202.svg)](https://doi.org/10.5281/zenodo.7575202) <a target="_blank" href="https://colab.research.google.com/github/alisamalb/LView/blob/main/LocalizedVolumeViewer.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 ## Description
 
 This script will help you creating a volume restraint for gromacs + plumed in the shape of a paraboloid.
 
-Run the code here on Google Colab
 
 This script takes two files as input:
 
