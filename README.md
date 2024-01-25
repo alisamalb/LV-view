@@ -1,5 +1,4 @@
 # Localized Volume Viewer: creating volume restraints for biased molecular dynamics
-Creators
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7575202.svg)](https://doi.org/10.5281/zenodo.7575202)
 
